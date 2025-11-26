@@ -1,0 +1,38 @@
+services:
+  tor:
+    build:
+      context: .
+      dockerfile: Dockerfile.tor
+    container_name: tor
+    restart: unless-stopped
+    volumes:
+      - ./tor_data:/var/lib/tor
+    networks:
+      - tor-network
+    depends_on:
+      - nginx
+    healthcheck:
+      test: ["CMD", "pgrep", "tor"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: nginx
+    restart: unless-stopped
+    networks:
+      - tor-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+networks:
+  tor-network:
+    driver: bridge

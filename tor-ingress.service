@@ -1,0 +1,11 @@
+[Unit]
+Description=docker-compose for onion-ingress
+Requires=podman.socket
+
+[Service]
+Environment=DOCKER_HOST=unix://%t/podman/podman.sock
+ExecStart=docker-compose -f /home/ubuntu/onion/docker-compose.yml up
+ExecStop=docker-compose -f /home/ubuntu/onion/docker-compose.yml stop
+
+[Install]
+WantedBy=default.target
